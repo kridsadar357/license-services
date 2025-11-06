@@ -1,0 +1,29 @@
+{
+  "name": "license-service",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "build": "bun build src/index.ts --compile --outfile=dist/server",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "license:generate": "bun run scripts/generate-license.ts"
+  },
+  "dependencies": {
+    "@elysiajs/cors": "^1.0.2",
+    "@elysiajs/swagger": "^1.0.5",
+    "bcryptjs": "^2.4.3",
+    "drizzle-orm": "^0.30.10",
+    "elysia": "latest",
+    "mysql2": "^3.9.7",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/uuid": "^9.0.8",
+    "bun-types": "latest",
+    "drizzle-kit": "^0.21.1",
+    "typescript": "^5.4.5"
+  }
+}
+
