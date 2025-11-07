@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TKGH License Services</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=1">
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Window Controls -->
+  <div class="window-controls">
+    <button class="window-control-btn minimize-btn" id="minimizeBtn" title="ย่อหน้าต่าง">
+      <svg width="12" height="12" viewBox="0 0 12 12">
+        <path d="M0 6h12" stroke="currentColor" stroke-width="1.5" fill="none"/>
+      </svg>
+    </button>
+    <button class="window-control-btn maximize-btn" id="maximizeBtn" title="ขยายหน้าต่าง">
+      <svg width="12" height="12" viewBox="0 0 12 12" id="maximizeIcon">
+        <rect x="1" y="1" width="10" height="10" stroke="currentColor" stroke-width="1.5" fill="none"/>
+      </svg>
+      <svg width="12" height="12" viewBox="0 0 12 12" id="restoreIcon" style="display: none;">
+        <path d="M2 2h8v8H2z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        <path d="M4 4h8v8" stroke="currentColor" stroke-width="1.5" fill="none"/>
+      </svg>
+    </button>
+    <button class="window-control-btn close-btn" id="closeBtn" title="ปิด">
+      <svg width="12" height="12" viewBox="0 0 12 12">
+        <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" fill="none"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="container">
+    <div class="cards-wrapper">
+    <!-- Password Dialog Modal -->
+    <div class="modal" id="passwordModal" style="display: none;">
+      <div class="modal-content" style="max-width: 400px;">
+        <h2>ยืนยันการล้างข้อมูล</h2>
+        <p style="margin-bottom: 16px; color: var(--color-white-muted);">กรุณากรอกรหัสผ่านเพื่อยืนยันการล้างข้อมูลใบอนุญาต</p>
+        <div class="form-group">
+          <label for="passwordInput">รหัสผ่าน</label>
+          <input type="password" id="passwordInput" placeholder="กรุณากรอกรหัสผ่าน" autocomplete="off">
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 16px;">
+          <button class="btn btn-primary" id="confirmClearBtn" style="flex: 1;">ยืนยัน</button>
+          <button class="btn btn-secondary" id="cancelClearBtn" style="flex: 1;">ยกเลิก</button>
+        </div>
+        <div id="passwordError" class="message error" style="display: none; margin-top: 12px;"></div>
+      </div>
+    </div>
+
+    <!-- Current License Card (shown if license is activated) -->
+    <div class="card" id="currentLicenseCard" style="display: none;">
+      <h2>ใบอนุญาตที่เปิดใช้งานอยู่</h2>
+      <div id="currentLicenseStatus">
+        <div class="status-item">
+          <strong>สถานะ:</strong> <span id="currentStatusText"></span>
+        </div>
+        <div class="status-item">
+          <strong>ผลิตภัณฑ์:</strong> <span id="currentProductText"></span>
+        </div>
+        <div class="status-item">
+          <strong>วันที่เปิดใช้งาน:</strong> <span id="currentActivatedText"></span>
+        </div>
+        <div class="status-item">
+          <strong>โทเค็นการเปิดใช้งาน:</strong>
+          <code id="currentTokenText"></code>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 12px;">
+        <button class="btn btn-secondary" id="refreshLicenseBtn" style="flex: 1;">รีเฟรช</button>
+        <button class="btn btn-secondary" id="clearLicenseBtn" style="flex: 1;">ล้างข้อมูล</button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="activate" id="activateTab">
+        เปิดใช้งานใบอนุญาต
+      </button>
+      <button class="tab-btn" data-tab="verify" id="verifyTab">
+        ตรวจสอบใบอนุญาต
+      </button>
+    </div>
+
+    <!-- Activation Tab Content -->
+    <div class="tab-content active" id="activateTabContent">
+    <div class="card" id="activationCard">
+      <form id="activationForm">
+        <div class="form-group">
+          <label for="productId">รหัสผลิตภัณฑ์ *</label>
+          <input type="text" id="productId" required placeholder="เช่น my-product">
+        </div>
+
+        <div class="form-group">
+          <label for="licenseKey">รหัสใบอนุญาต *</label>
+          <input type="text" id="licenseKey" required placeholder="กรุณากรอกรหัสใบอนุญาต">
+        </div>
+
+        <div class="form-group">
+          <label for="customerName">ชื่อของคุณ (ไม่บังคับ)</label>
+          <input type="text" id="customerName" placeholder="ชื่อ นามสกุล">
+        </div>
+
+        <div class="form-group">
+          <label for="customerEmail">อีเมลของคุณ (ไม่บังคับ)</label>
+          <input type="email" id="customerEmail" placeholder="example@email.com">
+        </div>
+
+        <div class="form-group">
+          <label for="hardwareId">รหัสอุปกรณ์</label>
+          <input type="text" id="hardwareId" readonly>
+          <small>รหัสนี้จะถูกตรวจจับอัตโนมัติจากอุปกรณ์ของคุณ</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="activateBtn">
+          เปิดใช้งานใบอนุญาต
+        </button>
+      </form>
+    </div>
+    </div>
+
+    <!-- Verification Tab Content -->
+    <div class="tab-content" id="verifyTabContent">
+    <div class="card" id="verifyCard">
+      <h2>ตรวจสอบใบอนุญาตที่มีอยู่</h2>
+      <form id="verifyForm">
+        <div class="form-group">
+          <label for="activationToken">โทเค็นการเปิดใช้งาน</label>
+          <input type="text" id="activationToken" required placeholder="กรุณากรอกโทเค็นการเปิดใช้งาน">
+        </div>
+        <button type="submit" class="btn btn-secondary">ตรวจสอบใบอนุญาต</button>
+      </form>
+    </div>
+    </div>
+
+    <!-- Current License Card (always visible if activated) -->
+    <div class="card" id="currentLicenseCard" style="display: none;">
+      <h2>ใบอนุญาตที่เปิดใช้งานอยู่</h2>
+      <div id="currentLicenseStatus">
+        <div class="status-item">
+          <strong>สถานะ:</strong> <span id="currentStatusText"></span>
+        </div>
+        <div class="status-item">
+          <strong>ผลิตภัณฑ์:</strong> <span id="currentProductText"></span>
+        </div>
+        <div class="status-item">
+          <strong>วันที่เปิดใช้งาน:</strong> <span id="currentActivatedText"></span>
+        </div>
+        <div class="status-item">
+          <strong>โทเค็นการเปิดใช้งาน:</strong>
+          <code id="currentTokenText"></code>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 12px;">
+        <button class="btn btn-secondary" id="refreshLicenseBtn" style="flex: 1;">รีเฟรช</button>
+        <button class="btn btn-secondary" id="clearLicenseBtn" style="flex: 1;">ล้างข้อมูล</button>
+      </div>
+    </div>
+
+    <!-- License Status Card (shown after activation/verification) -->
+    <div class="card" id="verificationCard" style="display: none;">
+      <h2>สถานะใบอนุญาต</h2>
+      <div id="licenseStatus">
+        <div class="status-item">
+          <strong>สถานะ:</strong> <span id="statusText"></span>
+        </div>
+        <div class="status-item">
+          <strong>ผลิตภัณฑ์:</strong> <span id="productText"></span>
+        </div>
+        <div class="status-item">
+          <strong>วันที่เปิดใช้งาน:</strong> <span id="activatedText"></span>
+        </div>
+        <div class="status-item">
+          <strong>โทเค็นการเปิดใช้งาน:</strong>
+          <code id="tokenText"></code>
+        </div>
+      </div>
+      <button class="btn btn-secondary" id="backBtn">กลับไปยังแท็บ</button>
+    </div>
+
+    </div>
+    <div id="message" class="message" style="display: none;"></div>
+  </div>
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>
+

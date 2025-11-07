@@ -1,31 +1,25 @@
 version: '3.8'
 
 services:
-  ########################################
-  # MySQL Database Service
-  ########################################
   mysql-db:
     image: mysql:8.0
     container_name: mysql-license-db
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      # !! สำคัญ: เปลี่ยนรหัสผ่านเหล่านี้
-      MYSQL_ROOT_PASSWORD: 'root_password_change_me' 
-      MYSQL_DATABASE: 'license_db'
-      MYSQL_USER: 'license_user'
-      MYSQL_PASSWORD: 'license_pass_123'
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_DATABASE: ""
+      MYSQL_USER: ""
+      MYSQL_PASSWORD: ""
     ports:
-      # เปิด Port 3307 ของเครื่อง Server (Host) ให้เชื่อมต่อกับ 3306 ใน Container
-      # ใช้ 3307 เพื่อหลีกเลี่ยงการชนกับ MySQL ที่รันอยู่แล้วบนเครื่อง
-      # เพื่อให้ Elysia App ของคุณ (ที่อาจจะรันอยู่นอก Compose นี้) เชื่อมต่อได้
       - "3307:3306"
     volumes:
-      # ใช้ named volume เพื่อเก็บข้อมูล Database อย่างถาวร
       - mysql-data:/var/lib/mysql
     networks:
       - license-net
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot_password_change_me"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,6 +28,8 @@ services:
     image: phpmyadmin/phpmyadmin
     container_name: pma-license-ui
     restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - "8080:80"
     environment:
@@ -51,11 +47,13 @@ services:
       dockerfile: Dockerfile
     container_name: license-api
     restart: unless-stopped
-    ports:
-      - "3000:3000"
+    env_file:
+      - .env
     environment:
-      DATABASE_URL: "mysql://license_user:license_pass_123@mysql-db:3306/license_db"
-      PORT: "3000"
+      DATABASE_URL: ""
+      PORT: ""
+    ports:
+      - ":3000"
     networks:
       - license-net
     depends_on:

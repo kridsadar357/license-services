@@ -1,0 +1,58 @@
+{
+  "name": "native-license-service",
+  "version": "1.0.0",
+  "description": "TKGH License Services - License Activation Client",
+  "author": "TKGH License Services",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:main\" \"npm run dev:preload\" \"npm run dev:renderer\" \"wait-on http://localhost:5174 && electron .\"",
+    "dev:main": "tsc -w -p tsconfig.main.json",
+    "dev:preload": "tsc -w -p tsconfig.preload.json",
+    "dev:renderer": "vite",
+    "build": "tsc -p tsconfig.main.json && tsc -p tsconfig.preload.json && vite build",
+    "build:win": "npm run build && electron-builder --win",
+    "build:win:msi": "npm run build && electron-builder --win --config.win.target=msi",
+    "start": "electron dist/main.js",
+    "pack": "electron-builder"
+  },
+  "build": {
+    "appId": "com.tkgh.licenseservices",
+    "productName": "TKGH License Services",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json",
+      "icon.png"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "dotenv": "^17.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "concurrently": "^8.2.2",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8",
+    "wait-on": "^7.2.0"
+  }
+}
