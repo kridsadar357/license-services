@@ -13,6 +13,7 @@
     "@elysiajs/cors": "^1.0.2",
     "@elysiajs/swagger": "^1.0.5",
     "bcryptjs": "^2.4.3",
+    "dotenv": "^17.2.3",
     "drizzle-orm": "^0.30.10",
     "elysia": "latest",
     "mysql2": "^3.9.7",
@@ -26,4 +27,3 @@
     "typescript": "^5.4.5"
   }
 }
-
